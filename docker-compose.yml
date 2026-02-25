@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  sd_html:
+    image: node:24-bookworm
+    container_name: sd_html
+    restart: unless-stopped
+    working_dir: /app
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    command: sh -c "chown -R node:node /app/node_modules && sleep infinity"
+    stdin_open: true
+    tty: true
+
+volumes:
+  node_modules:
+
+

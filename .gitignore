@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.DS_Store
+.env
+storage/temp/
+!storage/temp/.gitkeep
+test/fixtures/input/
+!test/fixtures/input/.gitkeep
+test/fixtures/output/
+!test/fixtures/output/.gitkeep

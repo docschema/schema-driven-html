@@ -1,0 +1,38 @@
+{
+  "name": "@docschema/schema-driven-html",
+  "version": "0.0.1",
+  "description": "JSON Schema extraction and deterministic rendering engine for a HTML-based document DSL.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "test:spec": "vitest run test/spec/",
+    "test:fixtures": "vitest run test/fixtures/",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/docschema/schema-driven-html.git"
+  },
+  "author": "docschema",
+  "keywords": [
+    "html",
+    "jsonschema",
+    "renderer"
+  ]
+}

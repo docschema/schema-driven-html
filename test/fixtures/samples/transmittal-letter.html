@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- グローバル設定 -->
+    <meta name="timezone" content="Asia/Tokyo" />
+    <meta name="semantic:examples-delimiter" content=";" />
+    
+    <!-- スキーマ定義用メタデータ -->
+    <meta name="semantic-description:letters" content="送付状データのリスト" />
+    <meta name="semantic-description:letters.sender" content="差出人情報" />
+    <meta name="semantic-description:letters.recipient" content="宛先情報" />
+</head>
+<body style="font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif; line-height: 1.6; font-size: 10.5pt;">
+    
+    <!-- 1件の送付状データにつき1ページを出力 -->
+    <section data-page="letters as letter" data-break-after="always" style="padding: 40px 50px; max-width: 800px; margin: 0 auto;">
+        
+        <!-- ヘッダー（日付）: 右寄せ -->
+        <div style="text-align: right; margin-bottom: 20px;">
+            <p>{{ letter.issueDate:date | date-format:YYYY年MM月DD日 }}</p>
+        </div>
+
+        <!-- 宛名エリア: 左寄せ -->
+        <div style="text-align: left; margin-bottom: 30px;">
+            <p style="font-size: 14pt; font-weight: bold; border-bottom: 1px solid #000; display: inline-block;">
+                {{ letter.recipient.companyName:string }}<br>
+                {{ letter.recipient.departmentName:string? }}<br>
+                <span>{{ letter.recipient.name:string }} 様</span>
+            </p>
+        </div>
+
+        <!-- 差出人エリア: 右寄せ -->
+        <div style="text-align: right; margin-bottom: 50px; line-height: 1.4; font-size: 10pt;">
+            <p style="font-weight: bold; margin-bottom: 5px;">{{ letter.sender.companyName:string }}</p>
+            <p>
+                〒{{ letter.sender.zipCode:string (pattern:"^\d{3}-\d{4}$") }}<br>
+                {{ letter.sender.address:string }}<br>
+                TEL: {{ letter.sender.phone:string }}<br>
+                担当: {{ letter.sender.staffName:string }}
+            </p>
+        </div>
+
+        <!-- 件名: 中央揃え -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 18pt; text-decoration: underline; font-weight: bold; letter-spacing: 2px;">
+                {{ letter.subject:string }}について
+            </h1>
+        </div>
+
+        <!-- 挨拶文: 本文 -->
+        <div style="margin-bottom: 30px; text-align: justify;">
+            <p style="margin-bottom: 15px;">拝啓</p>
+            
+            <p style="text-indent: 1em; margin-bottom: 15px;">
+                {{ letter.greeting.season:string }}の候、貴社におかれましては益々ご清栄のこととお慶び申し上げます。<br>
+                平素は格別のご高配を賜り、厚く御礼申し上げます。
+            </p>
+            
+            <p style="text-indent: 1em; margin-bottom: 15px;">
+                さて、早速ではございますが、下記の書類を送付いたしましたので、ご査収のほどよろしくお願い申し上げます。<br>
+                ご不明な点などがございましたら、お手数ですが上記担当者までご連絡いただけますようお願い申し上げます。
+            </p>
+            
+            <p style="text-align: right;">敬具</p>
+        </div>
+
+        <!-- 記書き（同封書類リスト） -->
+        <div data-if="letter.enclosures" style="margin: 0 auto; width: 80%;">
+            <p style="text-align: center; font-weight: bold; margin-bottom: 15px;">記</p>
+            
+            <ul style="list-style-type: none; padding-left: 20px;">
+                <!-- 同封書類の反復 -->
+                <li data-repeat="letter.enclosures as doc" style="margin-bottom: 5px;">
+                    <span style="display: inline-block; width: 300px;">
+                        {{ doc.name:string }}
+                    </span>
+                    <span style="display: inline-block;">
+                        {{ doc.count:integer (min:1) | default:1 }} 通
+                    </span>
+                </li>
+            </ul>
+
+            <p style="text-align: right; margin-top: 30px;">以　上</p>
+        </div>
+
+        <!-- 備考欄（オプション） -->
+        <div data-if="letter.notes" style="margin-top: 50px; padding: 10px; border: 1px dashed #ccc; font-size: 10pt;">
+            <p style="font-weight: bold;">【備考】</p>
+            <p style="white-space: pre-wrap;">{{ letter.notes:string }}</p>
+        </div>
+
+    </section>
+</body>
+</html>

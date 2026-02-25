@@ -1,0 +1,6 @@
+.devcontainer/
+docker-compose.yml
+.github/
+.vscode/
+test/
+src/
