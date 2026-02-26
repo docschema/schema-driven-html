@@ -21,7 +21,7 @@ DSL PROMPT: [DSL_PROMPT](./DSL_PROMPT.md)
 ## Installation
 
 ```bash
-npm install @docschema/schema-driven-html@alpha
+npm install @docschema/schema-driven-html
 ```
 
 ## Quick Example
