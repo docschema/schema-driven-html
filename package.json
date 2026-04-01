@@ -1,6 +1,6 @@
 {
   "name": "@docschema/schema-driven-html",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "JSON Schema extraction and deterministic rendering engine for a HTML-based document DSL.",
   "type": "module",
   "main": "dist/index.js",

@@ -41,6 +41,22 @@ For `img`:
 - `src` must start with `data:`
 - non-data URLs are removed
 
+For disallowed tags:
+
+- Tags not in the allowed list are removed together with all their descendant content during parsing.
+- Representative examples of disallowed tags by category:
+
+| Category | Tags |
+| :--- | :--- |
+| Headings | `h1`, `h2`, `h3`, `h4`, `h5`, `h6` |
+| Navigation / Sectioning | `nav`, `aside`, `article`, `figure`, `figcaption`, `details`, `summary` |
+| Text / Inline | `a`, `blockquote`, `pre`, `code`, `abbr`, `sub`, `sup`, `mark` |
+| Table supplements | `caption`, `tfoot`, `col` |
+| Description lists | `dl`, `dt`, `dd` |
+| Forms | `form`, `input`, `button`, `select`, `textarea`, `label`, `fieldset`, `legend` |
+| Media / Embeds | `audio`, `video`, `canvas`, `svg`, `iframe`, `embed`, `object` |
+| Scripting / Document | `script`, `style`, `link`, `title`, `noscript`, `template` |
+
 Tags and attributes outside the allowed list are ignored during parsing.
 
 ## CSS
