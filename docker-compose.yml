@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   sd_html:
     image: node:24-bookworm
