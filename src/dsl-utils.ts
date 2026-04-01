@@ -57,7 +57,7 @@ export function escapeHtml(value: string): string {
 export function collectGlobalConfig(root: ElementNode): GlobalConfig {
   const config: GlobalConfig = {
     timezone: "UTC",
-    examplesDelimiter: ";",
+    examplesDelimiter: ",",
   };
 
   walkElements(root, (el) => {
