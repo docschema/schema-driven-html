@@ -9,7 +9,7 @@ describe("semantic injection", () => {
         <head>
           <meta name="semantic-description:user.name" content="User name" />
           <meta name="semantic-instruction:user.name" content="Use official name" />
-          <meta name="semantic-examples:user.name" content="Alice; Bob" />
+          <meta name="semantic-examples:user.name" content="Alice, Bob" />
         </head>
         <body><p>{{ user.name:string }}</p></body>
       </html>
@@ -27,8 +27,8 @@ describe("semantic injection", () => {
     const ast = parseHtml(`
       <html>
         <head>
-          <meta name="semantic:examples-delimiter" content="," />
-          <meta name="semantic-examples:user.code" content="A,B,C" />
+          <meta name="semantic:examples-delimiter" content=";" />
+          <meta name="semantic-examples:user.code" content="A;B;C" />
         </head>
         <body><p>{{ user.code:string }}</p></body>
       </html>

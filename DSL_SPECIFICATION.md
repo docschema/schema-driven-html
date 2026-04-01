@@ -236,7 +236,7 @@ Define semantics in `head` using `meta` tags.
 | :--- | :--- | :--- |
 | `semantic-description` | Defines **what** the field is. | Mapped to `description`. |
 | `semantic-instruction` | Specific advice on **how** to find data and **how** to generate the value. | Mapped to `x-instruction`. |
-| `semantic-examples` | Concrete examples of expected data. Multiple values can be specified with semicolon (`;`) delimiters. | Mapped to `examples` (Array). |
+| `semantic-examples` | Concrete examples of expected data. Multiple values can be specified with comma (",") delimiters. | Mapped to `examples` (Array). |
 
 Example:
 
@@ -260,7 +260,7 @@ Inline semantic syntax injects business semantics into enclosed interpolation ex
 | :--- | :--- | :--- |
 | `data-semantic-description` | Defines **what** the field is. | Mapped to `description`. |
 | `data-semantic-instruction` | Specific advice on **how** to find data and **how** to generate the value. | Mapped to `x-instruction`. |
-| `data-semantic-examples` | Concrete examples of expected data. Multiple values can be specified with semicolon (`;`) delimiters. | Mapped to `examples` (Array). |
+| `data-semantic-examples` | Concrete examples of expected data. Multiple values can be specified with comma (",") delimiters. | Mapped to `examples` (Array). |
 
 Example:
 
@@ -268,7 +268,7 @@ Example:
 <span
   data-semantic-description="The postal code for the billing address."
   data-semantic-instruction="Extract as 7 digits in '3-4' hyphenated format (e.g., 000-0000)."
-  data-semantic-examples="150-0042; 102-0001"
+  data-semantic-examples="150-0042, 102-0001"
 >
 〒 {{ billing_address.postal_code:string }}
 </span>
