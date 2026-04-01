@@ -1,3 +1,4 @@
+import { DslSyntaxError } from "./errors.js";
 import type {
   TextSegment,
   LiteralSegment,
@@ -118,19 +119,19 @@ function parseInterpolation(inner: string): InterpolationSegment {
   if (parenOpen >= 0) {
     const matchedParenClose = findMatchingParen(mainPart, parenOpen);
     if (matchedParenClose < 0) {
-      throw new Error("Unclosed constraint parentheses");
+      throw new DslSyntaxError("Unclosed constraint parentheses", { source: inner });
     }
 
     const trailing = mainPart.slice(matchedParenClose + 1).trim();
     if (trailing.length > 0) {
-      throw new Error("Unmatched constraint parentheses");
+      throw new DslSyntaxError("Unmatched constraint parentheses", { source: inner });
     }
 
     pathTypePart = mainPart.slice(0, parenOpen).trim();
     constraintsStr = mainPart.slice(parenOpen + 1, matchedParenClose).trim();
   } else {
     if (parenClose >= 0) {
-      throw new Error("Unmatched constraint parentheses");
+      throw new DslSyntaxError("Unmatched constraint parentheses", { source: mainPart });
     }
     pathTypePart = mainPart;
   }
@@ -166,12 +167,12 @@ function parsePathType(s: string): {
 } {
   const colonIdx = s.indexOf(":");
   if (colonIdx < 0) {
-    throw new Error("Type is required. Use {{ path:type ... }}");
+    throw new DslSyntaxError("Type is required. Use {{ path:type ... }}", { source: s });
   }
 
   const path = s.slice(0, colonIdx).trim();
   if (!PATH_RE.test(path)) {
-    throw new Error(`Invalid path: ${path}`);
+    throw new DslSyntaxError(`Invalid path: ${path}`, { path, source: s });
   }
   let typeStr = s.slice(colonIdx + 1).trim();
 
@@ -182,7 +183,7 @@ function parsePathType(s: string): {
   }
 
   if (!VALID_TYPES.has(typeStr)) {
-    throw new Error(`Invalid data type: ${typeStr}`);
+    throw new DslSyntaxError(`Invalid data type: ${typeStr}`, { source: typeStr });
   }
 
   return { path, dataType: typeStr as DataType, nullable };
@@ -224,7 +225,7 @@ function buildConstraint(
   switch (name) {
     case "enum":
       if (dataType === "boolean" || dataType === "date" || dataType === "time" || dataType === "datetime") {
-        throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+        throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
       }
       return {
         kind: "enum",
@@ -234,45 +235,45 @@ function buildConstraint(
     case "min":
       if (dataType === "string") return { kind: "minLength", value: Number(rawValue) };
       if (dataType === "integer" || dataType === "number") return { kind: "min", value: Number(rawValue) };
-      throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+      throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
 
     case "max":
       if (dataType === "string") return { kind: "maxLength", value: Number(rawValue) };
       if (dataType === "integer" || dataType === "number") return { kind: "max", value: Number(rawValue) };
-      throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+      throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
 
     case "exMin":
       if (dataType !== "integer" && dataType !== "number") {
-        throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+        throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
       }
       return { kind: "exMin", value: Number(rawValue) };
 
     case "exMax":
       if (dataType !== "integer" && dataType !== "number") {
-        throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+        throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
       }
       return { kind: "exMax", value: Number(rawValue) };
 
     case "step":
       if (dataType !== "integer" && dataType !== "number") {
-        throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+        throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
       }
       return { kind: "step", value: Number(rawValue) };
 
     case "pattern":
       if (dataType !== "string") {
-        throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+        throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
       }
       return { kind: "pattern", value: unquote(rawValue) };
 
     case "fixed":
       if (dataType === "date" || dataType === "time" || dataType === "datetime") {
-        throw new Error(`Constraint "${name}" is not allowed for type "${dataType}"`);
+        throw new DslSyntaxError(`Constraint "${name}" is not allowed for type "${dataType}"`, { source: name });
       }
       return { kind: "fixed", value: parseFixedValue(rawValue, dataType) };
 
     default:
-      throw new Error(`Unknown constraint: ${name}`);
+      throw new DslSyntaxError(`Unknown constraint: ${name}`, { source: name });
   }
 }
 
@@ -309,7 +310,7 @@ function parseFixedValue(
   if (dataType === "number") return parseFloat(unquoted);
   if (dataType === "boolean") {
     if (unquoted !== "true" && unquoted !== "false") {
-      throw new Error(`Invalid boolean literal: ${unquoted}`);
+      throw new DslSyntaxError(`Invalid boolean literal: ${unquoted}`, { source: unquoted });
     }
     return unquoted === "true";
   }
@@ -327,11 +328,12 @@ function parseFilter(s: string, dataType: DataType): Filter {
 
   const spec = FILTER_SPECS[dataType].get(name);
   if (!spec) {
-    throw new Error(`Filter "${name}" is not allowed for type "${dataType}"`);
+    throw new DslSyntaxError(`Filter "${name}" is not allowed for type "${dataType}"`, { source: s });
   }
   if (args.length < spec.min || args.length > spec.max) {
-    throw new Error(
-      `Filter "${name}" for type "${dataType}" expects ${spec.min === spec.max ? spec.min : `${spec.min}-${spec.max}`} args, got ${args.length}`
+    throw new DslSyntaxError(
+      `Filter "${name}" for type "${dataType}" expects ${spec.min === spec.max ? spec.min : `${spec.min}-${spec.max}`} args, got ${args.length}`,
+      { source: s }
     );
   }
 

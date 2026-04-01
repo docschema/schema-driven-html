@@ -1,3 +1,4 @@
+import { DataValidationError } from "./errors.js";
 import { isPlainObject } from "./dsl-utils.js";
 
 export function validateData(
@@ -27,13 +28,13 @@ function validateValue(value: unknown, schema: Record<string, unknown>, path: st
 
   if (schema.enum && Array.isArray(schema.enum)) {
     if (!schema.enum.some((entry) => Object.is(entry, value))) {
-      throw new Error(`Validation failed at ${path}: value is not in enum`);
+      throw new DataValidationError(`Validation failed at ${path}: value is not in enum`, { path });
     }
   }
 
   if (Object.prototype.hasOwnProperty.call(schema, "const")) {
     if (!Object.is(schema.const, value)) {
-      throw new Error(`Validation failed at ${path}: value is not const`);
+      throw new DataValidationError(`Validation failed at ${path}: value is not const`, { path });
     }
   }
 
@@ -65,41 +66,41 @@ function validateValue(value: unknown, schema: Record<string, unknown>, path: st
 function validateType(value: unknown, type: string, path: string): void {
   if (type === "object") {
     if (!isPlainObject(value)) {
-      throw new Error(`Validation failed at ${path}: expected object`);
+      throw new DataValidationError(`Validation failed at ${path}: expected object`, { path });
     }
     return;
   }
 
   if (type === "array") {
     if (!Array.isArray(value)) {
-      throw new Error(`Validation failed at ${path}: expected array`);
+      throw new DataValidationError(`Validation failed at ${path}: expected array`, { path });
     }
     return;
   }
 
   if (type === "integer") {
     if (typeof value !== "number" || !Number.isInteger(value)) {
-      throw new Error(`Validation failed at ${path}: expected integer`);
+      throw new DataValidationError(`Validation failed at ${path}: expected integer`, { path });
     }
     return;
   }
 
   if (type === "number") {
     if (typeof value !== "number" || Number.isNaN(value)) {
-      throw new Error(`Validation failed at ${path}: expected number`);
+      throw new DataValidationError(`Validation failed at ${path}: expected number`, { path });
     }
     return;
   }
 
   if (type === "null") {
     if (value !== null) {
-      throw new Error(`Validation failed at ${path}: expected null`);
+      throw new DataValidationError(`Validation failed at ${path}: expected null`, { path });
     }
     return;
   }
 
   if (typeof value !== type) {
-    throw new Error(`Validation failed at ${path}: expected ${type}`);
+    throw new DataValidationError(`Validation failed at ${path}: expected ${type}`, { path });
   }
 }
 
@@ -143,17 +144,17 @@ function validateStringConstraints(value: unknown, schema: Record<string, unknow
   if (typeof value !== "string") return;
 
   if (typeof schema.minLength === "number" && value.length < schema.minLength) {
-    throw new Error(`Validation failed at ${path}: shorter than minLength`);
+    throw new DataValidationError(`Validation failed at ${path}: shorter than minLength`, { path });
   }
 
   if (typeof schema.maxLength === "number" && value.length > schema.maxLength) {
-    throw new Error(`Validation failed at ${path}: longer than maxLength`);
+    throw new DataValidationError(`Validation failed at ${path}: longer than maxLength`, { path });
   }
 
   if (typeof schema.pattern === "string") {
     const regex = new RegExp(schema.pattern);
     if (!regex.test(value)) {
-      throw new Error(`Validation failed at ${path}: pattern mismatch`);
+      throw new DataValidationError(`Validation failed at ${path}: pattern mismatch`, { path });
     }
   }
 }
@@ -162,19 +163,19 @@ function validateNumberConstraints(value: unknown, schema: Record<string, unknow
   if (typeof value !== "number") return;
 
   if (typeof schema.minimum === "number" && value < schema.minimum) {
-    throw new Error(`Validation failed at ${path}: smaller than minimum`);
+    throw new DataValidationError(`Validation failed at ${path}: smaller than minimum`, { path });
   }
   if (typeof schema.maximum === "number" && value > schema.maximum) {
-    throw new Error(`Validation failed at ${path}: larger than maximum`);
+    throw new DataValidationError(`Validation failed at ${path}: larger than maximum`, { path });
   }
   if (typeof schema.exclusiveMinimum === "number" && value <= schema.exclusiveMinimum) {
-    throw new Error(`Validation failed at ${path}: not greater than exclusiveMinimum`);
+    throw new DataValidationError(`Validation failed at ${path}: not greater than exclusiveMinimum`, { path });
   }
   if (typeof schema.exclusiveMaximum === "number" && value >= schema.exclusiveMaximum) {
-    throw new Error(`Validation failed at ${path}: not less than exclusiveMaximum`);
+    throw new DataValidationError(`Validation failed at ${path}: not less than exclusiveMaximum`, { path });
   }
   if (typeof schema.multipleOf === "number" && value % schema.multipleOf !== 0) {
-    throw new Error(`Validation failed at ${path}: not multipleOf`);
+    throw new DataValidationError(`Validation failed at ${path}: not multipleOf`, { path });
   }
 }
 
@@ -187,6 +188,6 @@ function validateStringFormat(value: string, format: string, path: string): void
 
   const regex = formatRegex[format];
   if (regex && !regex.test(value)) {
-    throw new Error(`Validation failed at ${path}: invalid format ${format}`);
+    throw new DataValidationError(`Validation failed at ${path}: invalid format ${format}`, { path });
   }
 }

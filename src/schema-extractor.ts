@@ -1,3 +1,4 @@
+import { DslError, SchemaExtractionError } from "./errors.js";
 import {
   clonePathAliasMap,
   collectGlobalConfig,
@@ -36,22 +37,27 @@ export function extractSchemaFromAst(
   root: ElementNode,
   options: ExtractSchemaOptions = {}
 ): Record<string, unknown> {
-  const globalConfig = collectGlobalConfig(root);
-  const examplesDelimiter = options.examplesDelimiter ?? globalConfig.examplesDelimiter;
+  try {
+    const globalConfig = collectGlobalConfig(root);
+    const examplesDelimiter = options.examplesDelimiter ?? globalConfig.examplesDelimiter;
 
-  const metaSemantics = collectMetaSemantics(root, examplesDelimiter);
+    const metaSemantics = collectMetaSemantics(root, examplesDelimiter);
 
-  const schema: SchemaObject = {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
-    type: "object",
-    properties: {},
-    required: [],
-  };
+    const schema: SchemaObject = {
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      type: "object",
+      properties: {},
+      required: [],
+    };
 
-  const context: TraverseContext = { aliases: {} };
-  walkNode(root, schema, context, metaSemantics, examplesDelimiter);
+    const context: TraverseContext = { aliases: {} };
+    walkNode(root, schema, context, metaSemantics, examplesDelimiter);
 
-  return stableSortObject(schema) as Record<string, unknown>;
+    return stableSortObject(schema) as Record<string, unknown>;
+  } catch (err) {
+    if (err instanceof DslError) throw err;
+    throw new SchemaExtractionError(err instanceof Error ? err.message : String(err), { cause: err });
+  }
 }
 
 function walkNode(

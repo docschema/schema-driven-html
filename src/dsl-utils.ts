@@ -1,3 +1,4 @@
+import { DslSyntaxError } from "./errors.js";
 import type { DslNode, ElementNode } from "./types.js";
 
 export interface GlobalConfig {
@@ -12,7 +13,7 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
 export function parseIterationExpression(expr: string): { path: string; alias: string } {
   const match = expr.trim().match(/^([A-Za-z_$][A-Za-z0-9_$.]*)\s+as\s+([A-Za-z_$][A-Za-z0-9_$]*)$/);
   if (!match) {
-    throw new Error(`Invalid iteration expression: ${expr}`);
+    throw new DslSyntaxError(`Invalid iteration expression: ${expr}`, { source: expr });
   }
   return { path: match[1], alias: match[2] };
 }

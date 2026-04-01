@@ -1,3 +1,4 @@
+import { RenderError } from "./errors.js";
 import type { DataType, Filter } from "./types.js";
 
 export interface FilterContext {
@@ -71,7 +72,7 @@ function applySingleFilter(value: unknown, filter: Filter, context: FilterContex
     }
 
     default:
-      throw new Error(`Unknown filter: ${filter.name}`);
+      throw new RenderError(`Unknown filter: ${filter.name}`, { source: filter.name });
   }
 }
 
