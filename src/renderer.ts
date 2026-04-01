@@ -1,3 +1,4 @@
+import { DslError, RenderError } from "./errors.js";
 import { applyFilters } from "./filters.js";
 import {
   cloneAliasMap,
@@ -38,15 +39,20 @@ export function renderAst(
   data: Record<string, unknown>,
   options: RenderOptions = {}
 ): string {
-  const globalConfig = collectGlobalConfig(root);
+  try {
+    const globalConfig = collectGlobalConfig(root);
 
-  const context: RenderContext = {
-    data,
-    aliases: {},
-    timezone: options.timezone ?? globalConfig.timezone,
-  };
+    const context: RenderContext = {
+      data,
+      aliases: {},
+      timezone: options.timezone ?? globalConfig.timezone,
+    };
 
-  return renderElement(root, context);
+    return renderElement(root, context);
+  } catch (err) {
+    if (err instanceof DslError) throw err;
+    throw new RenderError(err instanceof Error ? err.message : String(err), { cause: err });
+  }
 }
 
 function renderNode(node: DslNode, context: RenderContext): string {
