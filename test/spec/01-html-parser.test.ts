@@ -59,6 +59,30 @@ describe("parseHtml", () => {
     expect(body.children[0]).toMatchObject({ type: "element", tagName: "img" });
   });
 
+  it("preserves img when src is an interpolation expression", () => {
+    const root = parseHtml(
+      '<html><body><img src="{{ logo.src:string }}" alt="logo"></body></html>'
+    );
+    const body = root.children[0];
+    if (body?.type !== "element") throw new Error("body not found");
+    expect(body.children).toHaveLength(1);
+    expect(body.children[0]).toMatchObject({ type: "element", tagName: "img" });
+    if (body.children[0]?.type !== "element") throw new Error("img not found");
+    expect(body.children[0].attributes.src).toBe("{{ logo.src:string }}");
+  });
+
+  it("removes img when src is external URL even alongside interpolation-src img", () => {
+    const root = parseHtml(
+      '<html><body><img src="https://example.com/bad.png" alt="bad"><img src="{{ logo.src:string }}" alt="ok"></body></html>'
+    );
+    const body = root.children[0];
+    if (body?.type !== "element") throw new Error("body not found");
+    expect(body.children).toHaveLength(1);
+    expect(body.children[0]).toMatchObject({ type: "element", tagName: "img" });
+    if (body.children[0]?.type !== "element") throw new Error("img not found");
+    expect(body.children[0].attributes.src).toBe("{{ logo.src:string }}");
+  });
+
   it("preserves meta tags in head", () => {
     const root = parseHtml(
       '<html><head><meta name="timezone" content="Asia/Tokyo"></head><body></body></html>'

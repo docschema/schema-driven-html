@@ -1,4 +1,4 @@
-# Template DSL Prompt
+# DSL_SPECIFICATION
 
 You are an AI agent that writes and edits HTML-based templates using the `schema-driven-html` DSL.
 This DSL embeds business semantics, data types, and display rules into HTML so that JSON Schema and rendered output are generated from a single source of truth.
@@ -310,7 +310,7 @@ Attach business-level descriptions to data fields via `<meta>` tags in `<head>`.
 | :--- | :--- | :--- |
 | `semantic-description` | What the field represents | `description` |
 | `semantic-instruction` | How to find/generate the value | `x-instruction` |
-| `semantic-examples` | Example values (`;`-delimited) | `examples` (array) |
+| `semantic-examples` | Example values (`|`-delimited) | `examples` (array) |
 
 ```html
 <head>
@@ -319,7 +319,7 @@ Attach business-level descriptions to data fields via `<meta>` tags in `<head>`.
   <meta name="semantic-instruction:billing_address"
         content="Find the address near the signature block or under 'Billing'." />
   <meta name="semantic-examples:billing_address"
-        content="Tokyo, Shibuya-ku 1-2-3; Osaka, Chuo-ku 4-5-6" />
+        content="Tokyo, Shibuya-ku 1-2-3|Osaka, Chuo-ku 4-5-6" />
 </head>
 ```
 
@@ -333,13 +333,13 @@ Attach semantics directly to a tag containing interpolations. These apply to the
 | :--- | :--- | :--- |
 | `data-semantic-description` | What the field is | `description` |
 | `data-semantic-instruction` | How to find/generate the value | `x-instruction` |
-| `data-semantic-examples` | Example values (`;`-delimited) | `examples` (array) |
+| `data-semantic-examples` | Example values (`|`-delimited) | `examples` (array) |
 
 ```html
 <span
   data-semantic-description="Postal code for billing."
   data-semantic-instruction="Extract as 3-4 hyphenated digits (e.g., 000-0000)."
-  data-semantic-examples="150-0042; 102-0001"
+  data-semantic-examples="150-0042|102-0001"
 >
   〒 {{ billing_address.postal_code:string }}
 </span>
@@ -354,12 +354,12 @@ Define in `<head>` with `<meta>` tags:
 | `name` | `content` example | Purpose |
 | :--- | :--- | :--- |
 | `timezone` | `Asia/Tokyo` | Timezone for `datetime` rendering |
-| `semantic:examples-delimiter` | `;` | Delimiter for `semantic-examples` values (default: `;`) |
+| `semantic:examples-delimiter` | `|` | Delimiter for `semantic-examples` values (default: `|`) |
 
 ```html
 <head>
   <meta name="timezone" content="Asia/Tokyo" />
-  <meta name="semantic:examples-delimiter" content=";" />
+  <meta name="semantic:examples-delimiter" content="|" />
 </head>
 ```
 

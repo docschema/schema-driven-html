@@ -20,8 +20,8 @@ describe("global config", () => {
     const ast = parseHtml(`
       <html>
         <head>
-          <meta name="semantic:examples-delimiter" content="|" />
-          <meta name="semantic-examples:user.role" content="admin|operator|viewer" />
+          <meta name="semantic:examples-delimiter" content=";" />
+          <meta name="semantic-examples:user.role" content="admin;operator;viewer" />
         </head>
         <body><p>{{ user.role:string }}</p></body>
       </html>
