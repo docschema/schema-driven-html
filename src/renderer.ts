@@ -8,6 +8,7 @@ import {
   isVoidTag,
   parseIterationExpression,
 } from "./dsl-utils.js";
+import { parseTextSegments } from "./expression-parser.js";
 import type { DslNode, ElementNode } from "./types.js";
 
 export interface RenderOptions {
@@ -137,7 +138,7 @@ function renderElementOnce(node: ElementNode, context: RenderContext): string {
     return "";
   }
 
-  const attrs = buildRenderedAttributes(node);
+  const attrs = buildRenderedAttributes(node, context);
   const open = `<${node.tagName}${attrs}>`;
 
   if (isVoidTag(node.tagName)) {
@@ -148,7 +149,24 @@ function renderElementOnce(node: ElementNode, context: RenderContext): string {
   return `${open}${body}</${node.tagName}>`;
 }
 
-function buildRenderedAttributes(node: ElementNode): string {
+function resolveAttrValue(value: string, context: RenderContext): string {
+  const segments = parseTextSegments(value);
+  return segments
+    .map((segment) => {
+      if (segment.kind === "literal") {
+        return segment.value;
+      }
+      const resolved = getByPath(context.data, context.aliases, segment.path);
+      const filtered = applyFilters(resolved, segment.filters, {
+        dataType: segment.dataType,
+        timezone: context.timezone,
+      });
+      return filtered == null ? "" : String(filtered);
+    })
+    .join("");
+}
+
+function buildRenderedAttributes(node: ElementNode, context: RenderContext): string {
   const entries: string[] = [];
   const styleParts: string[] = [];
 
@@ -171,7 +189,8 @@ function buildRenderedAttributes(node: ElementNode): string {
     if (CONTROL_ATTRIBUTES.has(key) || key === "style") {
       continue;
     }
-    entries.push(`${key}="${escapeHtml(value)}"`);
+    const resolved = resolveAttrValue(value, context);
+    entries.push(`${key}="${escapeHtml(resolved)}"`);
   }
 
   if (styleParts.length > 0) {
