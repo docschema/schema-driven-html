@@ -6,15 +6,15 @@ VERSION:0.0.1
 
 ## Overview
 
-This DSL is not just a placeholder syntax. It is designed to inject **business semantics** into HTML documents.
+This DSL is designed to inject **business semantics** into HTML documents.
 
-From static HTML to a dynamic schema:
+From static HTML to a dynamic schema:  
 Template declarations are used to automatically generate JSON Schema.
 
-Type and constraint enforcement:
+Type and constraint enforcement:  
 Display rules and input constraints are defined together, ensuring consistency from schema extraction through rendering.
 
-Context via metadata:
+Context via metadata:  
 By combining template declarations with metadata such as timezone, document-wide interpretation rules can be defined.
 
 ## HTML Tags and Standard Attributes
@@ -236,7 +236,7 @@ Define semantics in `head` using `meta` tags.
 | :--- | :--- | :--- |
 | `semantic-description` | Defines **what** the field is. | Mapped to `description`. |
 | `semantic-instruction` | Specific advice on **how** to find data and **how** to generate the value. | Mapped to `x-instruction`. |
-| `semantic-examples` | Concrete examples of expected data. Multiple values can be specified with comma (",") delimiters. | Mapped to `examples` (Array). |
+| `semantic-examples` | Concrete examples of expected data. Multiple values can be specified with pipe ("|") delimiters. | Mapped to `examples` (Array). |
 
 Example:
 
@@ -260,7 +260,7 @@ Inline semantic syntax injects business semantics into enclosed interpolation ex
 | :--- | :--- | :--- |
 | `data-semantic-description` | Defines **what** the field is. | Mapped to `description`. |
 | `data-semantic-instruction` | Specific advice on **how** to find data and **how** to generate the value. | Mapped to `x-instruction`. |
-| `data-semantic-examples` | Concrete examples of expected data. Multiple values can be specified with comma (",") delimiters. | Mapped to `examples` (Array). |
+| `data-semantic-examples` | Concrete examples of expected data. Multiple values can be specified with pipe ("|") delimiters. | Mapped to `examples` (Array). |
 
 Example:
 
@@ -268,7 +268,7 @@ Example:
 <span
   data-semantic-description="The postal code for the billing address."
   data-semantic-instruction="Extract as 7 digits in '3-4' hyphenated format (e.g., 000-0000)."
-  data-semantic-examples="150-0042, 102-0001"
+  data-semantic-examples="150-0042|102-0001"
 >
 〒 {{ billing_address.postal_code:string }}
 </span>
@@ -475,4 +475,4 @@ Define global configuration in `head` with `meta` tags.
 | NAME | CONTENT | Description |
 | ---- | ---- | ---- |
 | timezone | Asia/Tokyo | Timezone used during rendering |
-| semantic:examples-delimiter | `;` | Changes delimiter used by `semantic-examples` (default: `;`) |
+| semantic:examples-delimiter | `|` | Changes delimiter used by `semantic-examples` (default: `|`) |

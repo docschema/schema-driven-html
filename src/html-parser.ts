@@ -171,8 +171,11 @@ export function parseHtml(html: string): ElementNode {
       }
 
       const filteredAttrs = filterAttributes(attrs);
-      if (tagName === "img" && !filteredAttrs.src?.startsWith("data:")) {
-        continue;
+      if (tagName === "img") {
+        const src = filteredAttrs.src;
+        if (!src?.startsWith("data:") && !/\{\{.*\}\}/.test(src ?? "")) {
+          continue;
+        }
       }
 
       const node: ElementNode = {
